@@ -1,8 +1,12 @@
 package com.report.gen.pdf_report_generator.service;
 
 
+import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.Color;
+import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.draw.ILineDrawer;
@@ -15,6 +19,7 @@ import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.LineSeparator;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.properties.VerticalAlignment;
 import com.report.gen.pdf_report_generator.dto.ReportRequestDto;
 import com.report.gen.pdf_report_generator.formatter.ReportBodyGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,14 +62,23 @@ public class PdfReportService {
             );
             //logo.setTextAlignment(TextAlignment.JUSTIFIED_ALL);
             document.add(logo);
-
-
-            // Add header text
             Paragraph header = new Paragraph(reportTitle)
-                    .setFontColor(BLUE)
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA))
+                    .setFontColor(ColorConstants.BLUE)
                     .setBold()
+                    .setFontSize(20)
                     .setTextAlignment(TextAlignment.CENTER);
-            document.add(header);
+
+            for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
+                Rectangle pageSize = pdfDoc.getPage(i).getPageSize();
+                float x = pageSize.getWidth() / 3;
+                float y = pageSize.getTop() - 20;
+                 document.showTextAligned(header, x, y, i, TextAlignment.LEFT, VerticalAlignment.BOTTOM, 0);
+                document.add(header);
+            }
+
+
+
 
             // Add blue line
             ILineDrawer blueLine = new SolidLine(2);
